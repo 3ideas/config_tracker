@@ -40,11 +40,48 @@ nb_path: "index.ipynb"
 <li>A set of reports that can be run against the repository to see the changes that have been made.</li>
 </ul>
 <p>It also has a set of scripts aimed at a specific user, for transfering over from their existing tracking system. These may be useful to anyone doing something similar.</p>
-<h2 id="Install">Install<a class="anchor-link" href="#Install"> </a></h2><p>Copy the scripts to system (usr/local/bin ?) and ensure they are in your path.</p>
-<h2 id="How-to-use">How to use<a class="anchor-link" href="#How-to-use"> </a></h2><p>Add the scipts someplace in you path.</p>
-<p>Decide which system will hold the 'master' copy of the repository, this should be the system where reports are run against as only this system needs to hold all the data from any systems they are gathering information from.</p>
-<p>Initialise the repostitory on this system, this can be done</p>
-<p>Identify the location of where the repository should be held.</p>
+<h2 id="Install">Install<a class="anchor-link" href="#Install"> </a></h2><p>Copy the <code>scripts</code> directory from this repository to your system ensure they are in your path.</p>
+<p>Note: on the systems that configuration is to be captured only the <code>track_config.py</code> script is required.</p>
+<p>On the system which holds the master repository, all the contents of the <code>scripts</code> directory is required. The dependencies of diff2html is also required. Note a local docker build of this is available in the diff2html directory here. You should verify this works on your system first before generating any reports. The daff dependency is included in the scripts directory as daff.py, this has been prebuilt from source. More recent versions may be available in their respective homes below.</p>
+<h2 id="How-to-use">How to use<a class="anchor-link" href="#How-to-use"> </a></h2><p>Decide which system will hold the 'master' copy of the repository, this should be the system where reports are run against as only this system needs to hold all the data from any systems they are gathering information from.</p>
+<p>Initialise the repostitory on this system, this can be done as follows where config_repository is the name of the directory that holds the repository. Its name can be anything, but in the examples here it is called <code>config_repository</code></p>
+
+<pre><code>mkdir /path_to_repository/config_repository
+./initalise_repository.py -s hostname_of_master -r /path_to_repository/config_repository -i</code></pre>
+<p>This creates a mostly empty git repository in the directory specified. It will have one file in it called <code>README.md</code>,
+the contents of will be something like</p>
+
+<pre><code>This is the repository for all configuration. There should be a git branch for every server recorded here, the local server should be the active branch</code></pre>
+<h3 id="On-systems-being-tracked">On systems being tracked<a class="anchor-link" href="#On-systems-being-tracked"> </a></h3><p>This git repository created above should now be cloned to every system where configuration tracking should be done.</p>
+
+<pre><code>cd /users/bt
+git clone username@hostname:/path_to_repository/config_repository/.git</code></pre>
+<p>Two files need to be created, one with a list of tables to be captured and one with a list of files the are to be tracked in it. In the <code>examples</code> directory there is some examples of these files.</p>
+<p>A local branch is then created to hold the configuration. This is done with the <code>-i</code> option, note the branch name can be specified (<code>-b  servername</code>) but it defaults to the hostname of the system we are currently on.</p>
+
+<pre><code>track_config.py -F ../examples/file_list.txt -T ../examples/table_names.txt -r /path_to_repository/config_repository -i</code></pre>
+<p>This will initalise the branch and do an inital capture of the configuration in the repository.</p>
+<p>Then push the branch to the master with</p>
+
+<pre><code>cd /path_to_repository/config_repository &amp;&amp; git push -u origin `hostname`</code></pre>
+<p>It is suggested that a cron job to run on a regular interval (say every day), to capture configuration. The command to capture configuration and push it to master would be:</p>
+
+<pre><code>./track_config.py -F ../examples/file_list.txt -T ../examples/table_names.txt -r /path_to_repository/config_repository
+cd /path_to_repository/config_repository &amp;&amp; git push origin</code></pre>
+<p><strong>NOTE: on the master do not checkout any of the branches being pushed to it. This will result in git failing to push the branches to the master!!</strong></p>
+<h3 id="Running-a-report.">Running a report.<a class="anchor-link" href="#Running-a-report."> </a></h3><p>The script to generate a report is</p>
+
+<pre><code>generate_report.py -r /path_to_repository/config_repository -a hostname1 -b hostname2 -s path_to_styles/styles -o /path_to_output</code></pre>
+<p>where <code>hostname1</code> and <code>hostname2</code> are the names of the servers/branches to compare. The <code>path_to_styles/styles</code> should point to the <code>scripts/styles</code> directory. If only <code>-a</code> is specified it will generate only a history report of that server and not a comparison. If both are given then both history of changes and a comparison between systems is generated.</p>
+<p>In the output dir this will generate something like</p>
+
+<pre><code>index_server1_server2.html  original_files              server1                     server1_change_history.html server1_server2             server2                     server2_change_history.html styles</code></pre>
+<p>The entry points into the reports are:</p>
+<ul>
+<li><code>index_server1_server2.html</code> shows the differences between servers.</li>
+<li><code>server1_change_history.html</code> shows the change history of server1</li>
+<li><code>server2_change_history.html</code> shows the change history of server2</li>
+</ul>
 <h2 id="Dependencies">Dependencies<a class="anchor-link" href="#Dependencies"> </a></h2><p>The system requires python &gt;= 2.6 and git.</p>
 <p>It also requires utilies to generate diff reports in html format. Currently it uses</p>
 <ul>
