@@ -1,0 +1,3 @@
+/etc/*.conf
+/etc/*/*.conf
+/Users/bt/dummy.conf

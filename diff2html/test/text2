@@ -1,0 +1,29 @@
+Diff to Html generates pretty HTML diffs from unified and git diff output in your terminal
+
+Features
+Online Example
+Distributions
+Setup
+Usage
+Exit Status Codes
+Custom HTML wrapper template
+Examples
+Contribute
+Developing  - see the change
+License
+Thanks
+Features
+Unified diff and Git diff input
+Added some contents
+
+line-by-line and side-by-side diff
+
+new and old line numbers
+
+inserted and removed lines
+
+GitHub like style
+
+Code syntax highlight
+
+Line similarity matching
