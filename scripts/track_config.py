@@ -369,7 +369,7 @@ if __name__ == '__main__':
     ap.add_argument('-d', '--dest_dir', required=False,
                     help='Directory the files to be stored in', default='./')
     ap.add_argument('-r', '--repository', required=False,
-                    help='Repository  the files to be stored in (this overrides the --dest_dir option', default='./')
+                    help='Repository  the files to be stored in (this overrides the --dest_dir option', default='')
     ap.add_argument('-b', '--branch', required=False,
                     help='Branch to use, this defaults to the hostname of the system being run on! ', default='')
     ap.add_argument('-i', '--initalise', required=False,
